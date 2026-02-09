@@ -42,6 +42,10 @@ return array(
 			'colorThumb' => array(
 				'type' => 'string',
 				'default' => '#fff'
+			),
+			'labelsInside' => array(
+				'type' => 'boolean',
+				'default' => false
 			)
 		),
 		'supports' => array(

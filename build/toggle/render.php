@@ -32,18 +32,21 @@ $css_right = esc_attr($right_class);
 
 $color_off   = ! empty($attributes['colorOff']) ? esc_attr($attributes['colorOff']) : '#ccc';
 $color_on    = ! empty($attributes['colorOn']) ? esc_attr($attributes['colorOn']) : '#4caf50';
-$color_thumb = ! empty($attributes['colorThumb']) ? esc_attr($attributes['colorThumb']) : '#fff';
+$color_thumb  = ! empty($attributes['colorThumb']) ? esc_attr($attributes['colorThumb']) : '#fff';
+$labels_inside = ! empty($attributes['labelsInside']);
 
 $inline_styles = sprintf(
-	'--switch-bg: %s; --switch-active-bg: %s; --switch-thumb-bg: %s;',
+	'--switch-bg: %s; --switch-active-bg: %s; --switch-thumb-bg: %s; --switch-bg-off: %s;',
 	$color_off,
 	$color_on,
-	$color_thumb
+	$color_thumb,
+	$color_off
 );
 
-$wrapper_attributes    = wp_kses_data(get_block_wrapper_attributes());
-$interactivity_context = wp_kses_data(wp_interactivity_data_wp_context($context));
+$wrapper_attributes    = get_block_wrapper_attributes();
+$interactivity_context = wp_interactivity_data_wp_context($context);
 $is_right_class        = 'right' === $initial_side ? 'right' : '';
+$is_labels_inside      = $labels_inside ? 'is-labels-inside' : '';
 $aria_label           = esc_attr__('Toggle', 'flashblocks-toggle');
 
 $script = '';
@@ -54,6 +57,13 @@ if ('right' === $initial_side) {
 </script>
 htm;
 }
+
+$label_left_html  = ! $labels_inside ? "<span class=\"toggle-label\">{$label_left}</span>" : '';
+$label_right_html = ! $labels_inside ? "<span class=\"toggle-label\">{$label_right}</span>" : '';
+$inner_labels     = $labels_inside ? <<<htm
+	<span class="toggle-label-inner left">{$label_left}</span>
+	<span class="toggle-label-inner right">{$label_right}</span>
+htm : '';
 
 echo <<<htm
 <style>
@@ -71,19 +81,22 @@ echo <<<htm
 <div
 	{$wrapper_attributes}
 	data-wp-interactive="flashblocks/toggle"
+	data-wp-init="callbacks.init"
 	{$interactivity_context}>
 	<div
-		class="toggle-inner {$is_right_class}"
+		class="toggle-inner {$is_right_class} {$is_labels_inside}"
 		data-wp-class--right="state.isRight"
 		style="{$inline_styles}">
 		<div class="toggle-buttons">
-			<span class="toggle-label">{$label_left}</span>
+			{$label_left_html}
 			<button
 				class="toggle-switch"
 				type="button"
 				aria-label="{$aria_label}"
-				data-wp-on--click="actions.toggleContent"></button>
-			<span class="toggle-label">{$label_right}</span>
+				data-wp-on--click="actions.toggleContent">
+				{$inner_labels}
+			</button>
+			{$label_right_html}
 		</div>
 	</div>
 </div>

@@ -39,6 +39,10 @@
     "colorThumb": {
       "type": "string",
       "default": "#fff"
+    },
+    "labelsInside": {
+      "type": "boolean",
+      "default": false
     }
   },
   "supports": {

@@ -12,6 +12,7 @@ import {
 	PanelBody,
 	TextControl,
 	SelectControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import './editor.scss';
@@ -26,6 +27,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		colorOff,
 		colorOn,
 		colorThumb,
+		labelsInside,
 	} = attributes;
 	const [ activeSide, setActiveSide ] = useState( initialSide || 'left' );
 	const blockProps = useBlockProps();
@@ -64,8 +66,31 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		setActiveSide( initialSide );
 	}, [ initialSide ] );
 
+	// Sync state across multiple instances in the editor
+	useEffect( () => {
+		const handleSync = ( e ) => {
+			const { leftClass: eventClass, side } = e.detail;
+			if ( eventClass === leftClass ) {
+				setActiveSide( side );
+			}
+		};
+
+		window.addEventListener( 'flashblocks-toggle-sync', handleSync );
+		return () => {
+			window.removeEventListener( 'flashblocks-toggle-sync', handleSync );
+		};
+	}, [ leftClass ] );
+
 	const toggle = () => {
-		setActiveSide( activeSide === 'left' ? 'right' : 'left' );
+		const nextSide = activeSide === 'left' ? 'right' : 'left';
+		setActiveSide( nextSide );
+
+		// Inform other instances
+		window.dispatchEvent(
+			new CustomEvent( 'flashblocks-toggle-sync', {
+				detail: { leftClass, side: nextSide },
+			} )
+		);
 	};
 
 	const sanitizeClassName = ( val ) => {
@@ -158,6 +183,13 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 					/>
+					<ToggleControl
+						label={ __( 'Labels Inside', 'flashblocks-toggle' ) }
+						checked={ labelsInside }
+						onChange={ ( val ) =>
+							setAttributes( { labelsInside: val } )
+						}
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<InspectorControls group="color">
@@ -201,21 +233,33 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 				</div>
 			) }
 			<div
-				className={ `toggle-inner ${ activeSide === 'right' ? 'right' : '' }` }
+				className={ `toggle-inner ${ activeSide === 'right' ? 'right' : '' } ${ labelsInside ? 'is-labels-inside' : '' }` }
 				style={ {
-					'--switch-bg': colorOff,
-					'--switch-active-bg': colorOn,
-					'--switch-thumb-bg': colorThumb,
+					'--switch-bg': colorOff, // Fallback track bg
+					'--switch-active-bg': colorOn, // Thumb bg
+					'--switch-thumb-bg': colorThumb, // Active text color
+					'--switch-bg-off': colorOff, // Inactive text color
 				} }
 			>
 				<div className="toggle-buttons">
-					{ labelLeft || 'Left' }
+					{ ! labelsInside && ( labelLeft || 'Left' ) }
 					<Button
 						className="toggle-switch"
 						onClick={ toggle }
 						aria-label="Toggle"
-					></Button>
-					{ labelRight || 'Right' }
+					>
+						{ labelsInside && (
+							<>
+								<span className="toggle-label-inner left">
+									{ labelLeft || 'Left' }
+								</span>
+								<span className="toggle-label-inner right">
+									{ labelRight || 'Right' }
+								</span>
+							</>
+						) }
+					</Button>
+					{ ! labelsInside && ( labelRight || 'Right' ) }
 				</div>
 			</div>
 		</div>

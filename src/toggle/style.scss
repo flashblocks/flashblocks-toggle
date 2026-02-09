@@ -1,8 +1,12 @@
 .wp-block-flashblocks-toggle {
+	// Base variables
 	--switch-width: 50px;
 	--switch-height: 25px;
 	--switch-bg: #ccc;
 	--switch-active-bg: #4caf50;
+	--switch-thumb-bg: #fff;
+	--thumb-size: calc(var(--switch-height) - 4px);
+	--thumb-translate: calc(var(--switch-width) - var(--switch-height));
 
 	.toggle-buttons {
 		display: flex;
@@ -10,41 +14,91 @@
 		align-items: center;
 		gap: 10px;
 		margin-bottom: 20px;
+	}
+
+	.toggle-switch {
+		position: relative;
+		display: flex;
+		width: var(--switch-width);
+		height: var(--switch-height);
+		background: var(--switch-bg);
+		border-radius: var(--switch-height);
+		cursor: pointer;
+		transition: background 0.3s ease;
+		border: none;
+		outline: none;
+		color: inherit;
+		padding: 0;
+		overflow: hidden;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 2px;
+			left: 2px;
+			width: var(--thumb-size);
+			height: var(--thumb-size);
+			background: var(--switch-thumb-bg);
+			border-radius: 50%;
+			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			z-index: 1;
+		}
+
+		&:hover,
+		&:focus,
+		&:active {
+			color: inherit !important;
+			outline: none !important;
+			box-shadow: none !important;
+			text-decoration: none !important;
+		}
+	}
+
+	// Labels Inside overrides
+	.toggle-inner.is-labels-inside {
+		--switch-width: 280px;
+		--switch-height: 52px;
+		--thumb-size-w: calc(50% - 4px);
+		--thumb-size-h: calc(100% - 8px);
+		--thumb-translate: 100%;
 
 		.toggle-switch {
-			position: relative;
-			width: var(--switch-width);
-			height: var(--switch-height);
-			background: var(--switch-bg);
-			border-radius: var(--switch-height);
-			cursor: pointer;
-			transition: background 0.3s;
-			border: none;
-			outline: none;
+			border: 2px solid var(--track-border, currentColor);
+			padding: 4px;
 
 			&::after {
-				content: "";
-				position: absolute;
-				top: 2px;
-				left: 2px;
-				width: calc(var(--switch-height) - 4px);
-				height: calc(var(--switch-height) - 4px);
-				background: var(--switch-thumb-bg, #fff);
-				border-radius: 50%;
-				transition: transform 0.3s;
+				top: 4px;
+				left: 4px;
+				width: var(--thumb-size-w);
+				height: var(--thumb-size-h);
+				border-radius: var(--switch-height);
 			}
 		}
 	}
 
+	// Shared Active State
 	.toggle-inner.right {
 		.toggle-switch {
 			background: var(--switch-active-bg);
 
 			&::after {
-				transform: translateX(
-					calc(var(--switch-width) - var(--switch-height))
-				);
+				transform: translateX(var(--thumb-translate));
 			}
 		}
+	}
+
+	// Interior Labels
+	.toggle-label-inner {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 700;
+		font-size: 16px;
+		z-index: 2;
+		color: inherit;
+		pointer-events: none;
+		user-select: none;
+		text-transform: capitalize;
 	}
 }

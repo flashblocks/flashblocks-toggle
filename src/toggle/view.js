@@ -1,29 +1,38 @@
-import { store, getContext } from '@wordpress/interactivity';
+import { getContext, store } from "@wordpress/interactivity";
 
-store( 'flashblocks/toggle', {
+store("flashblocks/toggle", {
 	state: {
+		toggles: {},
 		get isRight() {
-			const context = getContext();
-			return context.activeSide === 'right';
+			const { toggles } = store("flashblocks/toggle").state;
+			const { leftClass, activeSide } = getContext();
+			return (toggles[leftClass] || activeSide) === "right";
 		},
 	},
 	actions: {
 		toggleContent: () => {
-			const context = getContext();
-			const newSide =
-				context.activeSide === 'left' ? 'right' : 'left';
-			context.activeSide = newSide;
+			const { state } = store("flashblocks/toggle");
+			const { leftClass } = getContext();
 
-			if ( newSide === 'right' ) {
-				document.body.setAttribute(
-					`data-toggle-${ context.leftClass }`,
-					'right'
-				);
+			const current = state.toggles[leftClass] || getContext().activeSide;
+			const next = current === "left" ? "right" : "left";
+
+			state.toggles[leftClass] = next;
+
+			if (next === "right") {
+				document.body.setAttribute(`data-toggle-${leftClass}`, "right");
 			} else {
-				document.body.removeAttribute(
-					`data-toggle-${ context.leftClass }`
-				);
+				document.body.removeAttribute(`data-toggle-${leftClass}`);
 			}
 		},
 	},
-} );
+	callbacks: {
+		init: () => {
+			const { state } = store("flashblocks/toggle");
+			const { leftClass, activeSide } = getContext();
+			if (!state.toggles[leftClass]) {
+				state.toggles[leftClass] = activeSide;
+			}
+		},
+	},
+});
