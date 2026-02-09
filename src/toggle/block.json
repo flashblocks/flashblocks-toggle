@@ -1,0 +1,72 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "flashblocks/toggle",
+	"version": "1.0.0",
+	"title": "Flashblocks Toggle",
+	"category": "widgets",
+	"textdomain": "flashblocks-toggle",
+	"description": "A toggle switch that shows or hides content by class name across the page.",
+	"attributes": {
+		"labelLeft": {
+			"type": "string",
+			"default": "Left"
+		},
+		"labelRight": {
+			"type": "string",
+			"default": "Right"
+		},
+		"leftClass": {
+			"type": "string",
+			"default": ""
+		},
+		"rightClass": {
+			"type": "string",
+			"default": ""
+		},
+		"initialSide": {
+			"type": "string",
+			"default": "left"
+		},
+		"colorOff": {
+			"type": "string",
+			"default": "#ccc"
+		},
+		"colorOn": {
+			"type": "string",
+			"default": "#4caf50"
+		},
+		"colorThumb": {
+			"type": "string",
+			"default": "#fff"
+		}
+	},
+	"supports": {
+		"html": false,
+		"interactivity": true,
+		"shadow": true,
+		"color": {
+			"background": true,
+			"text": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true
+			}
+		}
+	},
+	"editorStyle": "file:./index.css",
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php",
+	"viewScriptModule": "file:./view.js"
+}

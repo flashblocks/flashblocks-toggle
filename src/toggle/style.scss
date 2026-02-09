@@ -1,0 +1,50 @@
+.wp-block-flashblocks-toggle {
+	--switch-width: 50px;
+	--switch-height: 25px;
+	--switch-bg: #ccc;
+	--switch-active-bg: #4caf50;
+
+	.toggle-buttons {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 10px;
+		margin-bottom: 20px;
+
+		.toggle-switch {
+			position: relative;
+			width: var(--switch-width);
+			height: var(--switch-height);
+			background: var(--switch-bg);
+			border-radius: var(--switch-height);
+			cursor: pointer;
+			transition: background 0.3s;
+			border: none;
+			outline: none;
+
+			&::after {
+				content: "";
+				position: absolute;
+				top: 2px;
+				left: 2px;
+				width: calc(var(--switch-height) - 4px);
+				height: calc(var(--switch-height) - 4px);
+				background: var(--switch-thumb-bg, #fff);
+				border-radius: 50%;
+				transition: transform 0.3s;
+			}
+		}
+	}
+
+	.toggle-inner.right {
+		.toggle-switch {
+			background: var(--switch-active-bg);
+
+			&::after {
+				transform: translateX(
+					calc(var(--switch-width) - var(--switch-height))
+				);
+			}
+		}
+	}
+}

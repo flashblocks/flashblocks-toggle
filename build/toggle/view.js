@@ -1,0 +1,1 @@
+import{getContext as t,store as e}from"@wordpress/interactivity";e("flashblocks/toggle",{state:{get isRight(){return"right"===t().activeSide}},actions:{toggleContent:()=>{const e=t(),i="left"===e.activeSide?"right":"left";e.activeSide=i,"right"===i?document.body.setAttribute(`data-toggle-${e.leftClass}`,"right"):document.body.removeAttribute(`data-toggle-${e.leftClass}`)}}});
