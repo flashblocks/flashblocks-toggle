@@ -14,18 +14,13 @@
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start --blocks-manifest --experimental-modules"
 	},
-	"//devDependencies": {
+	"devDependencies": {
 		"@wordpress/scripts": "^30.20.0"
-	},
-	"//dependencies": {
-		"@emotion/react": "^11.14.0",
-		"@emotion/styled": "^11.14.1",
-		"@mui/material": "^7.3.1",
-		"@wordpress/interactivity": "^6.28.0"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.14.0",
 		"@emotion/styled": "^11.14.1",
-		"@mui/material": "^7.3.1"
+		"@mui/material": "^7.3.1",
+		"@wordpress/interactivity": "^6.28.0"
 	}
 }

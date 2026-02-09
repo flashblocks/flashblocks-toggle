@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	InspectorControls,
 	useBlockProps,
@@ -12,6 +13,7 @@ import {
 	TextControl,
 	SelectControl,
 } from '@wordpress/components';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import './editor.scss';
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
@@ -29,24 +31,38 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	const blockProps = useBlockProps();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
+	// Auto-reveal logic: If a block is selected (or any of its children), 
+	// ensure the toggle switch is on the correct side so the user can see it.
+	const hierarchyClasses = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockParents, getBlockAttributes } = select( blockEditorStore );
+		const selectedId = getSelectedBlockClientId();
+		if ( ! selectedId ) return [];
+
+		const parentIds = getBlockParents( selectedId );
+		const allIds = [ ...parentIds, selectedId ];
+		
+		return allIds.map( id => getBlockAttributes( id )?.className || '' );
+	}, [] );
+
+	useEffect( () => {
+		if ( ! hierarchyClasses.length ) return;
+
+		// Check if any block in the selection hierarchy has the left or right class
+		for ( const classString of hierarchyClasses ) {
+			const classes = classString.split( ' ' );
+			if ( rightClass && classes.includes( rightClass ) ) {
+				setActiveSide( 'right' );
+				break; 
+			} else if ( leftClass && classes.includes( leftClass ) ) {
+				setActiveSide( 'left' );
+				break;
+			}
+		}
+	}, [ hierarchyClasses, leftClass, rightClass ] );
+
 	useEffect( () => {
 		setActiveSide( initialSide );
 	}, [ initialSide ] );
-
-	useEffect( () => {
-		const body = document.body;
-		if ( ! leftClass ) return;
-
-		if ( activeSide === 'right' ) {
-			body.setAttribute( `data-toggle-${ leftClass }`, 'right' );
-		} else {
-			body.removeAttribute( `data-toggle-${ leftClass }` );
-		}
-
-		return () => {
-			body.removeAttribute( `data-toggle-${ leftClass }` );
-		};
-	}, [ activeSide, leftClass ] );
 
 	const toggle = () => {
 		setActiveSide( activeSide === 'left' ? 'right' : 'left' );
@@ -58,14 +74,12 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 
 	const isConfigured = leftClass && rightClass;
 
+	// In the editor, we directly control visibility via a scoped style tag.
+	// This is more reliable than body attributes in iframed editors.
 	const dynamicStyles =
 		isConfigured &&
 		`
-		body:not([data-toggle-${ leftClass }="right"]) .editor-styles-wrapper .${ rightClass } {
-			display: none !important;
-		}
-
-		body[data-toggle-${ leftClass }="right"] .editor-styles-wrapper .${ leftClass } {
+		.editor-styles-wrapper .${ activeSide === 'right' ? leftClass : rightClass } {
 			display: none !important;
 		}
 	`;
