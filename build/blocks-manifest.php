@@ -71,7 +71,6 @@ return array(
 				)
 			)
 		),
-		'editorStyle' => 'file:./index.css',
 		'editorScript' => 'file:./index.js',
 		'style' => 'file:./style-index.css',
 		'render' => 'file:./render.php',
