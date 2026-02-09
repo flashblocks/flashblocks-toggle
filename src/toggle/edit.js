@@ -29,7 +29,17 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		labelsInside,
 	} = attributes;
 	const [ activeSide, setActiveSide ] = useState( initialSide || 'left' );
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: `${ activeSide === 'right' ? 'right' : '' } ${
+			labelsInside ? 'is-labels-inside' : ''
+		}`,
+		style: {
+			'--switch-bg': colorOff,
+			'--switch-active-bg': colorOn,
+			'--switch-thumb-bg': colorThumb,
+			'--switch-bg-off': colorOff,
+		},
+	} );
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
 	// Auto-reveal logic: If a block is selected (or any of its children), 
@@ -231,36 +241,24 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 					) }
 				</div>
 			) }
-			<div
-				className={ `toggle-inner ${ activeSide === 'right' ? 'right' : '' } ${ labelsInside ? 'is-labels-inside' : '' }` }
-				style={ {
-					'--switch-bg': colorOff, // Fallback track bg
-					'--switch-active-bg': colorOn, // Thumb bg
-					'--switch-thumb-bg': colorThumb, // Active text color
-					'--switch-bg-off': colorOff, // Inactive text color
-				} }
+			{ ! labelsInside && ( labelLeft || 'Left' ) }
+			<Button
+				className="toggle-switch"
+				onClick={ toggle }
+				aria-label="Toggle"
 			>
-				<div className="toggle-buttons">
-					{ ! labelsInside && ( labelLeft || 'Left' ) }
-					<Button
-						className="toggle-switch"
-						onClick={ toggle }
-						aria-label="Toggle"
-					>
-						{ labelsInside && (
-							<>
-								<span className="toggle-label-inner left">
-									{ labelLeft || 'Left' }
-								</span>
-								<span className="toggle-label-inner right">
-									{ labelRight || 'Right' }
-								</span>
-							</>
-						) }
-					</Button>
-					{ ! labelsInside && ( labelRight || 'Right' ) }
-				</div>
-			</div>
+				{ labelsInside && (
+					<>
+						<span className="toggle-label-inner left">
+							{ labelLeft || 'Left' }
+						</span>
+						<span className="toggle-label-inner right">
+							{ labelRight || 'Right' }
+						</span>
+					</>
+				) }
+			</Button>
+			{ ! labelsInside && ( labelRight || 'Right' ) }
 		</div>
 	);
 }

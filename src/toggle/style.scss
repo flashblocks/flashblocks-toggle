@@ -8,13 +8,11 @@
 	--thumb-size: calc(var(--switch-height) - 4px);
 	--thumb-translate: calc(var(--switch-width) - var(--switch-height));
 
-	.toggle-buttons {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		gap: 10px;
-		margin-bottom: 20px;
-	}
+	// The block itself is now the flex container
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 10px;
 
 	.toggle-switch {
 		position: relative;
@@ -55,12 +53,15 @@
 	}
 
 	// Labels Inside overrides
-	.toggle-inner.is-labels-inside {
+	&.is-labels-inside {
 		--switch-width: 280px;
 		--switch-height: 52px;
 		--thumb-size-w: calc(50% - 4px);
 		--thumb-size-h: calc(100% - 8px);
 		--thumb-translate: 100%;
+
+		// Remove gap since labels are inside the button
+		gap: 0;
 
 		.toggle-switch {
 			border: 2px solid var(--track-border, currentColor);
@@ -77,7 +78,7 @@
 	}
 
 	// Shared Active State
-	.toggle-inner.right {
+	&.right {
 		.toggle-switch {
 			background: var(--switch-active-bg);
 
@@ -100,5 +101,14 @@
 		pointer-events: none;
 		user-select: none;
 		text-transform: capitalize;
+	}
+
+	// Warning for unconfigured block
+	.toggle-content-warning {
+		font-size: 14px;
+		opacity: 0.7;
+		font-style: italic;
+		text-align: center;
+		width: 100%;
 	}
 }

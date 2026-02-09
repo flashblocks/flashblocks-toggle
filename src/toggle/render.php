@@ -43,11 +43,16 @@ $inline_styles = sprintf(
 	$color_off
 );
 
-$wrapper_attributes    = get_block_wrapper_attributes();
+$is_right_class   = 'right' === $initial_side ? 'right' : '';
+$is_labels_inside = $labels_inside ? 'is-labels-inside' : '';
+$aria_label       = esc_attr__('Toggle', 'flashblocks-toggle');
+
+$wrapper_attributes = get_block_wrapper_attributes([
+	'class' => "{$is_right_class} {$is_labels_inside}",
+	'style' => $inline_styles,
+]);
+
 $interactivity_context = wp_interactivity_data_wp_context($context);
-$is_right_class        = 'right' === $initial_side ? 'right' : '';
-$is_labels_inside      = $labels_inside ? 'is-labels-inside' : '';
-$aria_label           = esc_attr__('Toggle', 'flashblocks-toggle');
 
 $script = '';
 if ('right' === $initial_side) {
@@ -82,22 +87,16 @@ echo <<<htm
 	{$wrapper_attributes}
 	data-wp-interactive="flashblocks/toggle"
 	data-wp-init="callbacks.init"
+	data-wp-class--right="state.isRight"
 	{$interactivity_context}>
-	<div
-		class="toggle-inner {$is_right_class} {$is_labels_inside}"
-		data-wp-class--right="state.isRight"
-		style="{$inline_styles}">
-		<div class="toggle-buttons">
-			{$label_left_html}
-			<button
-				class="toggle-switch"
-				type="button"
-				aria-label="{$aria_label}"
-				data-wp-on--click="actions.toggleContent">
-				{$inner_labels}
-			</button>
-			{$label_right_html}
-		</div>
-	</div>
+	{$label_left_html}
+	<button
+		class="toggle-switch"
+		type="button"
+		aria-label="{$aria_label}"
+		data-wp-on--click="actions.toggleContent">
+		{$inner_labels}
+	</button>
+	{$label_right_html}
 </div>
 htm;
