@@ -46,6 +46,18 @@ return array(
 			'labelsInside' => array(
 				'type' => 'boolean',
 				'default' => false
+			),
+			'switchWidth' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'switchHeight' => array(
+				'type' => 'string',
+				'default' => ''
+			),
+			'switchPadding' => array(
+				'type' => 'string',
+				'default' => ''
 			)
 		),
 		'supports' => array(
@@ -56,10 +68,6 @@ return array(
 				'background' => true,
 				'text' => true
 			),
-			'spacing' => array(
-				'margin' => true,
-				'padding' => true
-			),
 			'__experimentalBorder' => array(
 				'radius' => true,
 				'color' => true,
@@ -69,9 +77,60 @@ return array(
 					'color' => true,
 					'radius' => true
 				)
+			),
+			'typography' => array(
+				'fontSize' => true,
+				'lineHeight' => true,
+				'__experimentalFontFamily' => true,
+				'__experimentalFontWeight' => true,
+				'__experimentalFontStyle' => true,
+				'__experimentalTextTransform' => true,
+				'__experimentalTextDecoration' => true,
+				'__experimentalLetterSpacing' => true,
+				'__experimentalDefaultControls' => array(
+					'fontSize' => true
+				)
+			),
+			'spacing' => array(
+				'padding' => true,
+				'margin' => true,
+				'blockGap' => true,
+				'units' => array(
+					'px',
+					'em',
+					'rem',
+					'vh',
+					'vw'
+				),
+				'__experimentalDefaultControls' => array(
+					'padding' => true,
+					'blockGap' => true
+				)
+			),
+			'border' => array(
+				'color' => true,
+				'radius' => true,
+				'style' => true,
+				'width' => true
+			),
+			'layout' => array(
+				'allowSwitching' => false,
+				'allowInheriting' => false,
+				'allowVerticalAlignment' => false,
+				'allowSizingOnChildren' => true,
+				'allowJustification' => true,
+				'allowOrientation' => true,
+				'allowWrap' => true,
+				'default' => array(
+					'type' => 'flex',
+					'orientation' => 'horizontal',
+					'flexWrap' => 'nowrap',
+					'justifyContent' => 'center'
+				)
 			)
 		),
 		'editorScript' => 'file:./index.js',
+		'editorStyle' => 'file:./index.css',
 		'style' => 'file:./style-index.css',
 		'render' => 'file:./render.php',
 		'viewScriptModule' => 'file:./view.js'

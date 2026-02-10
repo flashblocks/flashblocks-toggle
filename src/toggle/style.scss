@@ -1,114 +1,123 @@
 .wp-block-flashblocks-toggle {
-	// Base variables
-	--switch-width: 50px;
-	--switch-height: 25px;
-	--switch-bg: #ccc;
+	// 1. Core Dimensions & State Logic
+	--switch-w: 60px;
+	--switch-h: 32px;
+	--switch-p: 4px;
+	--thumb-w: calc(var(--switch-h) - (var(--switch-p) * 2));
+	--thumb-h: calc(var(--switch-h) - (var(--switch-p) * 2));
+
+	--switch-bg-off: #ccc;
 	--switch-active-bg: #4caf50;
+	--switch-bg: var(--switch-bg-off);
 	--switch-thumb-bg: #fff;
-	--thumb-size: calc(var(--switch-height) - 4px);
-	--thumb-translate: calc(var(--switch-width) - var(--switch-height));
+	--thumb-x: 0px;
 
-	// The block itself is now the flex container
 	display: flex;
-	justify-content: center;
 	align-items: center;
-	gap: 10px;
+	position: relative;
 
+	// 2. Active Logic
+	&.right {
+		--switch-bg: var(--switch-active-bg);
+		--thumb-x: calc(var(--switch-w) - var(--thumb-w) - (var(--switch-p) * 2));
+	}
+
+	// 3. The Switch Track
 	.toggle-switch {
-		position: relative;
+		all: unset;
 		display: flex;
-		width: var(--switch-width);
-		height: var(--switch-height);
-		background: var(--switch-bg);
-		border-radius: var(--switch-height);
-		cursor: pointer;
-		transition: background 0.3s ease;
-		border: none;
-		outline: none;
-		color: inherit;
-		padding: 0;
+		position: relative;
 		overflow: hidden;
+		cursor: pointer;
+		flex-shrink: 0;
+		width: var(--switch-w);
+		height: var(--switch-h);
+		background: var(--switch-bg);
+		border-radius: 100px;
+		transition: background 0.3s ease;
 
 		&::after {
 			content: "";
 			position: absolute;
-			top: 2px;
-			left: 2px;
-			width: var(--thumb-size);
-			height: var(--thumb-size);
+			top: var(--switch-p);
+			left: var(--switch-p);
+			width: var(--thumb-w);
+			height: var(--thumb-h);
 			background: var(--switch-thumb-bg);
-			border-radius: 50%;
+			border-radius: 100px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			transform: translateX(var(--thumb-x));
 			z-index: 1;
 		}
 
-		&:hover,
-		&:focus,
-		&:active {
-			color: inherit !important;
-			outline: none !important;
-			box-shadow: none !important;
-			text-decoration: none !important;
+		&:focus-visible {
+			outline: 2px solid var(--wp--preset--color--accent-1, #007cba);
+			outline-offset: 2px;
 		}
 	}
 
-	// Labels Inside overrides
+	// 4. "Labels Inside" Variant
 	&.is-labels-inside {
-		--switch-width: 280px;
-		--switch-height: 52px;
-		--thumb-size-w: calc(50% - 4px);
-		--thumb-size-h: calc(100% - 8px);
-		--thumb-translate: 100%;
+		--switch-w: 280px;
+		--thumb-w: calc(50% - var(--switch-p));
 
-		// Remove gap since labels are inside the button
-		gap: 0;
+		width: var(--switch-w);
+		height: var(--switch-h);
+		padding: 0; // Padding handled via absolute positioning of thumb
+		background: var(--switch-bg);
+		border-radius: 100px;
+		transition: background 0.3s ease;
+		overflow: hidden;
+
+		&.right {
+			--thumb-x: 100%; // Slides by its own width (50% - padding)
+		}
 
 		.toggle-switch {
-			border: 2px solid var(--track-border, currentColor);
-			padding: 4px;
+			width: 100%;
+			height: 100%;
+			background: transparent;
 
 			&::after {
-				top: 4px;
-				left: 4px;
-				width: var(--thumb-size-w);
-				height: var(--thumb-size-h);
-				border-radius: var(--switch-height);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			}
+		}
+
+		// Text contrast surfacing
+		.toggle-label-inner {
+			z-index: 2;
+			color: rgba(255, 255, 255, 0.7);
+			transition: color 0.3s ease;
+
+			&.left {
+				color: #000;
+			}
+		}
+
+		&.right .toggle-label-inner {
+			&.left {
+				color: rgba(255, 255, 255, 0.7);
+			}
+
+			&.right {
+				color: #000;
 			}
 		}
 	}
 
-	// Shared Active State
-	&.right {
-		.toggle-switch {
-			background: var(--switch-active-bg);
-
-			&::after {
-				transform: translateX(var(--thumb-translate));
-			}
-		}
-	}
-
-	// Interior Labels
+	// 5. Labels & Typography
 	.toggle-label-inner {
 		flex: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-weight: 700;
-		font-size: 16px;
-		z-index: 2;
-		color: inherit;
 		pointer-events: none;
 		user-select: none;
-		text-transform: capitalize;
 	}
 
-	// Warning for unconfigured block
-	.toggle-content-warning {
-		font-size: 14px;
-		opacity: 0.7;
-		font-style: italic;
-		text-align: center;
-		width: 100%;
+	.toggle-label {
+		cursor: pointer;
+		user-select: none;
 	}
 }

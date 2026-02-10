@@ -10,93 +10,73 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
-$left_class  = ! empty($attributes['leftClass']) ? sanitize_title($attributes['leftClass']) : '';
-$right_class = ! empty($attributes['rightClass']) ? sanitize_title($attributes['rightClass']) : '';
+$left   = sanitize_title($attributes['leftClass'] ?? '');
+$right  = sanitize_title($attributes['rightClass'] ?? '');
 
-if (empty($left_class) || empty($right_class)) {
+if (! $left || ! $right) {
+	if (is_admin()) echo '<div class="wp-block-flashblocks-toggle-error">Configure Left/Right classes in settings.</div>';
 	return;
 }
 
-$label_left   = ! empty($attributes['labelLeft']) ? esc_html($attributes['labelLeft']) : esc_html__('Left', 'flashblocks-toggle');
-$label_right  = ! empty($attributes['labelRight']) ? esc_html($attributes['labelRight']) : esc_html__('Right', 'flashblocks-toggle');
-$initial_side = ! empty($attributes['initialSide']) && 'right' === $attributes['initialSide'] ? 'right' : 'left';
+$id      = substr(md5($left . $right), 0, 8);
+$active  = $attributes['initialSide'] ?? 'left';
+$inside  = $attributes['labelsInside'] ?? false;
+$l_label = esc_html($attributes['labelLeft'] ?? __('Left', 'flashblocks-toggle'));
+$r_label = esc_html($attributes['labelRight'] ?? __('Right', 'flashblocks-toggle'));
 
-$context = array(
-	'leftClass'  => $left_class,
-	'rightClass' => $right_class,
-	'activeSide' => $initial_side,
-);
-
-$css_left  = esc_attr($left_class);
-$css_right = esc_attr($right_class);
-
-$color_off   = ! empty($attributes['colorOff']) ? esc_attr($attributes['colorOff']) : '#ccc';
-$color_on    = ! empty($attributes['colorOn']) ? esc_attr($attributes['colorOn']) : '#4caf50';
-$color_thumb  = ! empty($attributes['colorThumb']) ? esc_attr($attributes['colorThumb']) : '#fff';
-$labels_inside = ! empty($attributes['labelsInside']);
+$w = !empty($attributes['switchWidth']) ? $attributes['switchWidth'] : null;
+$h = !empty($attributes['switchHeight']) ? $attributes['switchHeight'] : null;
+$p = !empty($attributes['switchPadding']) ? $attributes['switchPadding'] : null;
 
 $inline_styles = sprintf(
-	'--switch-bg: %s; --switch-active-bg: %s; --switch-thumb-bg: %s; --switch-bg-off: %s;',
-	$color_off,
-	$color_on,
-	$color_thumb,
-	$color_off
+	'--switch-bg-off: %1$s; --switch-active-bg: %2$s; --switch-thumb-bg: %3$s;%4$s%5$s%6$s',
+	esc_attr($attributes['colorOff'] ?? '#ccc'),
+	esc_attr($attributes['colorOn'] ?? '#4caf50'),
+	esc_attr($attributes['colorThumb'] ?? '#fff'),
+	$w ? " --switch-w: $w;" : "",
+	$h ? " --switch-h: $h;" : "",
+	$p ? " --switch-p: $p;" : ""
 );
 
-$is_right_class   = 'right' === $initial_side ? 'right' : '';
-$is_labels_inside = $labels_inside ? 'is-labels-inside' : '';
-$aria_label       = esc_attr__('Toggle', 'flashblocks-toggle');
-
 $wrapper_attributes = get_block_wrapper_attributes([
-	'class' => "{$is_right_class} {$is_labels_inside}",
+	'class' => ('right' === $active ? 'right ' : '') . ($inside ? 'is-labels-inside' : ''),
 	'style' => $inline_styles,
 ]);
 
-$interactivity_context = wp_interactivity_data_wp_context($context);
-
-$script = '';
-if ('right' === $initial_side) {
-	$script = <<<htm
-<script>
-	document.body.setAttribute('data-toggle-{$css_left}', 'right');
-</script>
-htm;
+if (! is_admin()) {
+	static $configs = [];
+	if (! isset($configs["$left-$right"])) {
+		$configs["$left-$right"] = true;
+		wp_add_inline_style('flashblocks-toggle-style', "body:not([data-toggle-$left=\"right\"]) .$right { display: none !important; } body[data-toggle-$left=\"right\"] .$left { display: none !important; }");
+		if ('right' === $active) echo "<script>document.body.setAttribute('data-toggle-" . esc_js($left) . "', 'right');</script>";
+	}
 }
 
-$label_left_html  = ! $labels_inside ? "<span class=\"toggle-label\">{$label_left}</span>" : '';
-$label_right_html = ! $labels_inside ? "<span class=\"toggle-label\">{$label_right}</span>" : '';
-$inner_labels     = $labels_inside ? <<<htm
-	<span class="toggle-label-inner left">{$label_left}</span>
-	<span class="toggle-label-inner right">{$label_right}</span>
-htm : '';
+$context = wp_interactivity_data_wp_context(['leftClass' => $left, 'rightClass' => $right, 'activeSide' => $active]);
+$l_id    = "toggle-label-$id-l";
+$r_id    = "toggle-label-$id-r";
+
+$l_html  = ! $inside ? "<span id=\"$l_id\" class=\"toggle-label left\">$l_label</span>" : '';
+$r_html  = ! $inside ? "<span id=\"$r_id\" class=\"toggle-label right\">$r_label</span>" : '';
+$i_html  = $inside ? "<span id=\"$l_id\" class=\"toggle-label-inner left\">$l_label</span><span id=\"$r_id\" class=\"toggle-label-inner right\">$r_label</span>" : '';
 
 echo <<<htm
-<style>
-	body:not([data-toggle-{$css_left}="right"]) .{$css_right} {
-		display: none !important;
-	}
-
-	body[data-toggle-{$css_left}="right"] .{$css_left} {
-		display: none !important;
-	}
-</style>
-
-{$script}
-
 <div
 	{$wrapper_attributes}
 	data-wp-interactive="flashblocks/toggle"
 	data-wp-init="callbacks.init"
 	data-wp-class--right="state.isRight"
-	{$interactivity_context}>
-	{$label_left_html}
+	{$context}>
+	{$l_html}
 	<button
 		class="toggle-switch"
 		type="button"
-		aria-label="{$aria_label}"
+		role="switch"
+		aria-labelledby="{$l_id} {$r_id}"
+		data-wp-bind--aria-checked="state.isRight"
 		data-wp-on--click="actions.toggleContent">
-		{$inner_labels}
+		{$i_html}
 	</button>
-	{$label_right_html}
+	{$r_html}
 </div>
 htm;

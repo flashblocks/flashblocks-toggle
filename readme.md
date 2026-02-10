@@ -4,95 +4,86 @@
 **Tags:** block, toggle, switch, content toggle, interactivity-api, flashblocks\
 **Requires at least:** 6.7\
 **Tested up to:** 6.8\
-**Stable tag:** 1.0.0\
+**Stable tag:** 1.0.1\
 **Requires PHP:** 7.4\
-**License:** GPLv2 or later\
-**License URI:** https://www.gnu.org/licenses/gpl-2.0.html
+**License:** GPLv2 or later
 
 Flashblocks Toggle is a lightweight, high-performance WordPress block built
 using the **WordPress Interactivity API**. It allows users to create a localized
 toggle switch that controls the visibility of content items across the entire
 page based on CSS class names.
 
-Commonly used for:
-
-- Price toggles (Monthly vs. Annual)
-- Language switches
-- Simple state management for page sections
-
 ## Key Features
 
 - **Interactivity API Powered:** Fast, reactive, and built the "WordPress way."
-- **Global Control:** Toggle content anywhere on the page, not just inside the
-  block itself.
-- **Accessible:** Uses semantic HTML and button elements for keyboard
-  navigation.
-- **Highly Customizable:** Supports custom labels, initial state, and uses
-  standard WordPress design tools for styling.
-- **Zero Configuration CSS:** Automatically generates the necessary CSS to
-  handle visibility based on your selected classes.
+- **Zero-Flicker Rendering:** Uses inline scripts to set the toggle state before
+  the page paints, preventing Cumulative Layout Shift (CLS).
+- **Auto-Reveal Editor Logic:** Automatically switches the toggle in the editor
+  when you select a block containing one of the target classes.
+- **"Labels Inside" Mode:** A premium UI option that transforms the switch into
+  a large, pill-style toggle with internal labels.
+- **Global Control:** Toggle content anywhere on the page instantly via
+  body-level data attributes.
+- **Accessible:** Fully keyboard-accessible with semantic HTML (`role="switch"`)
+  and dynamic ARIA attributes.
+- **Lightweight:** Zero external dependencies (No MUI/Emotion). Uses native
+  WordPress components and CSS variables.
 
-## How It Works (Step-by-Step)
+## How It Works
 
-1. **Add the Block:** Insert the **Flashblocks Toggle** block into your page.
-2. **Configure Classes:**
-   - Find the **Toggle Settings** in the sidebar.
-   - Set the **Left Class** (e.g., `monthly`).
-   - Set the **Right Class** (e.g., `annually`).
-3. **Set Labels:** Update the **Left Label** and **Right Label** (e.g.,
-   "Monthly" and "Annual Plan").
-4. **Tag Your Content:**
-   - Select any other block on your page (e.g., a Group, Column, or Heading).
-   - Go to **Advanced > Additional CSS classes**.
-   - Add the corresponding class name (either your Left Class or Right Class).
-5. **Publish:** When the toggle is switched, the Interactivity API updates a
-   data attribute on the `<body>` element, which triggers CSS to show/hide the
-   matching blocks instantly.
+1. **Add the Block:** Insert the **Flashblocks Toggle** block.
+2. **Configure Classes:** Set a **Left Class** (e.g., `monthly`) and a **Right
+   Class** (e.g., `annually`).
+3. **Tag Your Content:** Add these classes to any other blocks on the page
+   (Advanced > Additional CSS classes).
+4. **Visibility:** On the frontend, the Interactivity API toggles a
+   `data-toggle-{leftClass}="right"` attribute on the `<body>`.
+5. **CSS Logic:** The plugin automatically injects highly specific CSS to
+   show/hide the matching elements.
 
-## Block Settings
+## Technical Implementation
 
-- **Left/Right Class:** Unique CSS classes used to identify which elements to
-  show/hide.
-- **Initial Side:** Choose which side is active by default on page load.
-- **Labels:** Text displayed next to the toggle switch.
-- **Interactivity API:** Seamlessly handles state transitions without page
-  reloads.
+- **PHP Rendering:** Uses `<<<htm` heredoc syntax for clean, maintainable
+  output.
+- **CSS Variables:** Fully customizable via CSS variables (e.g.,
+  `--switch-active-bg`, `--switch-height`).
+- **Editor Isolation:** Frontend visibility logic is wrapped in `!is_admin()`
+  checks to ensure the editor view remains stable and doesn't "fight" the manual
+  toggle clicks.
+- **Assets:** Built via `@wordpress/scripts` with manifest support.
 
 ## Development
 
-The block is built using `@wordpress/scripts`.
+```bash
+# Install dependencies
+npm install
 
-1. **Environmental Setup:**
-   - Ensure Node.js and npm are installed.
-   - Navigate to the plugin directory:
-     `wp-content/mu-plugins/flashblocks-toggle`.
-2. **Installation:**
-   ```bash
-   npm install
-   ```
-3. **Local Development:**
-   ```bash
-   npm start
-   ```
-   _Runs the build process in watch mode._
-4. **Production Build:**
-   ```bash
-   npm run build
-   ```
-   _Minifies and optimizes code for production use._
+# Start development (watch mode)
+npm start
 
-## Technical Details
-
-The block utilizes a CSS-only show/hide mechanism triggered by a body attribute:
-
-```css
-body:not([data-toggle-leftclass="right"]) .right-class {
-    display: none !important;
-}
-body[data-toggle-leftclass="right"] .left-class {
-    display: none !important;
-}
+# Production build
+npm run build
 ```
 
-This ensures that "Cumulative Layout Shift" (CLS) is minimized and the toggle
-state is reflected immediately upon page load if an initial state is set.
+---
+
+## AI & Developer Context (Read First)
+
+If you are an AI assistant or developer working on this codebase, keep these
+architectural patterns in mind:
+
+- **Namespace:** All Interactivity API logic resides in the `flashblocks/toggle`
+  namespace.
+- **Editor Stability:** Visibility in the editor is controlled via a reactive
+  `<style>` tag in `edit.js` scoped to `.editor-styles-wrapper`. Do **not**
+  inject body attributes in the editor.
+- **Auto-Reveal:** The `edit.js` uses a `useSelect` hook to detect current
+  selection. It uses a `ref` (`lastSelectionId`) to ensure the toggle only
+  auto-flips when the selection _moves_ to a different block, allowing users to
+  manually toggle while staying on the same block.
+- **State Syncing:** Multiple instances of the toggle with the same `leftClass`
+  are kept in sync via a `CustomEvent` named `flashblocks-toggle-sync`.
+- **Heredoc Preference:** When editing `render.php`, always prefer the `<<<htm`
+  heredoc syntax for HTML output.
+- **Pruned Deps:** Do not re-add MUI or Emotion. Use WordPress core components
+  from `@wordpress/components` or vanilla CSS/SCSS.
