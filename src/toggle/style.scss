@@ -27,7 +27,6 @@
 		all: unset;
 		display: flex;
 		position: relative;
-		overflow: hidden;
 		cursor: pointer;
 		flex-shrink: 0;
 		width: var(--switch-w);
@@ -52,7 +51,7 @@
 		}
 
 		&:focus-visible {
-			outline: 2px solid var(--wp--preset--color--accent-1, #007cba);
+			outline: -webkit-focus-ring-color auto 2px;
 			outline-offset: 2px;
 		}
 	}
@@ -68,7 +67,6 @@
 		background: var(--switch-bg);
 		border-radius: 100px;
 		transition: background 0.3s ease;
-		overflow: hidden;
 
 		&.right {
 			--thumb-x: 100%; // Slides by its own width (50% - padding)
