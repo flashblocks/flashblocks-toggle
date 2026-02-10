@@ -47,8 +47,15 @@ if (! is_admin()) {
 	static $configs = [];
 	if (! isset($configs["$left-$right"])) {
 		$configs["$left-$right"] = true;
-		wp_add_inline_style('flashblocks-toggle-style', "body:not([data-toggle-$left=\"right\"]) .$right { display: none !important; } body[data-toggle-$left=\"right\"] .$left { display: none !important; }");
-		if ('right' === $active) echo "<script>document.body.setAttribute('data-toggle-" . esc_js($left) . "', 'right');</script>";
+		$attr         = "data-toggle-$left";
+		$hide_initial = 'right' === $active ? $left : $right;
+		$toggle_css   = <<<CSS
+		body:not([$attr]) .$hide_initial { display: none !important; }
+		body[$attr="left"] .$right { display: none !important; }
+		body[$attr="right"] .$left { display: none !important; }
+		.$left, .$right { animation: toggleFadeIn .8s ease; }
+		CSS;
+		wp_add_inline_style('flashblocks-toggle-style', $toggle_css);
 	}
 }
 

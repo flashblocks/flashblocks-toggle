@@ -16,12 +16,7 @@ const { state } = store("flashblocks/toggle", {
 
 			state.toggles[leftClass] = next;
 
-			// Sync to body attribute for CSS targeting.
-			if (next === "right") {
-				document.body.setAttribute(`data-toggle-${leftClass}`, "right");
-			} else {
-				document.body.removeAttribute(`data-toggle-${leftClass}`);
-			}
+			document.body.setAttribute(`data-toggle-${leftClass}`, next);
 		},
 	},
 	callbacks: {
